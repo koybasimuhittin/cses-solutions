@@ -74,9 +74,8 @@ int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
 
-    cin >> n;
+    cin >> n >> k;
     build(1, 1, n);
-    k = 1;
 
     vector<int> will_removed;
     int last_removed = 0;
