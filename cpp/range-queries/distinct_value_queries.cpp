@@ -1,7 +1,5 @@
 #include <bits/stdc++.h>
-
 using namespace std;
-
 #define endl '\n'
 #define f1 first
 #define s2 second
@@ -11,100 +9,72 @@ using namespace std;
 #define fro(a) freopen(a, "w", stdout);
 const int MOD = 1e9 + 7;
 const int N = 2e5 + 5;
-const int SQRT = 450;
+int SQRT = 450;
 
-typedef struct Query {
-    int index, l, r, sqrt;
-
+struct Query {
+    int index, l, r, block;
     bool operator<(const Query& other) const {
-        if (other.sqrt == sqrt) {
-            return l < other.l;
-        }
-
-        return sqrt < other.sqrt;
+        if (block != other.block) return block < other.block;
+        return (block & 1) ? (r > other.r) : (r < other.r);
     }
-} Query;
+};
 
-int n, m, t, arr[N], ans[N], cnt[N], res;
+int n, m, t, arr[N], ans[N], cnt[N];
 Query queries[N];
-unordered_map<int, int> inverse;
 
-int32_t main() {
-    // fri("in.txt");
-    // fro("out.txt");
+int main() {
+
+    //fri("in.txt");
+    //fro("out.txt");
 
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
 
+
     cin >> n >> m;
+    SQRT = max(1, int(n / sqrt(m)));
 
-    for (int i = 0; i < n; i++) {
-        cin >> arr[i];
-        inverse[arr[i]] = i;
-    }
+    for (int i = 0;i < n;i++) cin >> arr[i];
 
-    for (int i = 0; i < n; i++) {
-        arr[i] = inverse[arr[i]];
+    vector<int> vals(arr, arr + n);
+    sort(vals.begin(), vals.end());
+    vals.erase(unique(vals.begin(), vals.end()), vals.end());
+
+    for (int i = 0;i < n;i++) {
+        arr[i] = lower_bound(vals.begin(), vals.end(), arr[i]) - vals.begin();
     }
 
     int l, r;
-    for (int i = 0; i < m; i++) {
-        cin >> l >> r;
-        l--;
-        r--;
-        queries[i] = {i, l, r, r / SQRT};
+    for (int i = 0;i < m;i++) {
+        cin >> l >> r; l--; r--;
+        queries[i] = { i, l, r, l / SQRT };
     }
 
     sort(queries, queries + m);
+    int curL = 0, curR = -1, curAns = 0;
 
-    for (int i = queries[0].l; i <= queries[0].r; i++) {
-        if (cnt[arr[i]] == 0) {
-            res++;
+    for (int i = 0;i < m;i++) {
+        Query& q = queries[i];
+        while (curL > q.l) {
+            curL--;
+            if (cnt[arr[curL]]++ == 0) curAns++;
         }
-        cnt[arr[i]]++;
-    }
-    ans[queries[0].index] = res;
-
-    l = queries[0].l;
-    r = queries[0].r;
-
-    for (int i = 1; i < m; i++) {
-        while (l < queries[i].l) {
-            cnt[arr[l]]--;
-            if (cnt[arr[l]] == 0) {
-                res--;
-            }
-            l++;
+        while (curR < q.r) {
+            curR++;
+            if (cnt[arr[curR]]++ == 0) curAns++;
         }
-
-        while (l > queries[i].l) {
-            l--;
-            if (cnt[arr[l]] == 0) {
-                res++;
-            }
-            cnt[arr[l]]++;
+        while (curL < q.l) {
+            if (--cnt[arr[curL]] == 0) curAns--;
+            curL++;
         }
-
-        while (r < queries[i].r) {
-            r++;
-            if (cnt[arr[r]] == 0) {
-                res++;
-            }
-            cnt[arr[r]]++;
+        while (curR > q.r) {
+            if (--cnt[arr[curR]] == 0) curAns--;
+            curR--;
         }
-
-        while (r > queries[i].r) {
-            cnt[arr[r]]--;
-            if (cnt[arr[r]] == 0) {
-                res--;
-            }
-            r--;
-        }
-
-        ans[queries[i].index] = res;
+        ans[q.index] = curAns;
     }
 
-    for (int i = 0; i < m; i++) {
+    for (int i = 0;i < m;i++) {
         cout << ans[i] << endl;
     }
     return 0;
