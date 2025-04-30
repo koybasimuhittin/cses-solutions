@@ -106,9 +106,7 @@ int32_t main() {
         }
     }
     cout << cut.size() << endl;
-    for (int i = 0; i < cut.size(); i++) {
-        cout << cut[i].f1 + 1 << " " << cut[i].s2 + 1 << endl;
-    }
+
 
     return 0;
 }
