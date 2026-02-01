@@ -130,8 +130,8 @@ void build_lcp() {
 
 int32_t main() {
 
-    //fri("in.txt");
-    //fro("out.txt");
+    fri("in.txt");
+    fro("out.txt");
 
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
@@ -156,18 +156,14 @@ int32_t main() {
     build_lcp();
 
     for (int i = 1; i < n; i++) {
-        int substring_cnt = n - suffix_array[i] - 1 - lcp[i];
-        if (q - substring_cnt <= 0) {
-            for (int j = 0; j < lcp[i] + q; j++) {
-                cout << s[suffix_array[i] + j];
-            }
-            cout << endl;
-            break;
+        for (int j = suffix_array[i]; j < n; j++) {
+            cout << s[j];
         }
-        q -= substring_cnt;
+        cout << endl;
     }
-
-
-
+    cout << endl;
+    for (int i = 2; i < n; i++) {
+        cout << lcp[i] << " ";
+    }
     return 0;
 }
