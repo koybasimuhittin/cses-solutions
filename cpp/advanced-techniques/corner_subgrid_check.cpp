@@ -15,14 +15,13 @@ const int MOD = 1e9 + 7;
 const int N = 3e3;
 
 bitset<N> v[26][N];
-unordered_set<bitset<N>> seen[26];
 int n, m, grid[N][N];
 
 
 int32_t main() {
 
-    fri("in.txt");
-    fro("out.txt");
+    //fri("in.txt");
+    //fro("out.txt");
 
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
@@ -36,26 +35,28 @@ int32_t main() {
             grid[i][j] = s[j] - 'A';
         }
     }
-    int idx, idx_low;
+    int idx;
+    int cnt;
     for (int c = 0; c < m; c++) {
         bool flag = false;
         idx = 0;
         bitset<N> bs;
         for (int i = 0; i < n && !flag; i++) {
             bs = 0;
+            cnt = 0;
             for (int j = 0; j < n; j++) {
                 if (grid[i][j] == c) {
                     bs.set(j, true);
+                    cnt++;
                 }
             }
-            if (bs.count() < 2 || seen[c].count(bs) != 0)continue;
+            if (cnt < 2)continue;
             for (int j = idx - 1; j >= 0 && !flag; j--) {
                 if ((bs & (v[c][j])).count() >= 2) {
                     flag = true;
                 }
             }
             v[c][idx] = bs;
-            seen[c].insert(bs);
             idx++;
         }
 

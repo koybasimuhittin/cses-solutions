@@ -7,23 +7,68 @@ using namespace std;
 #define s2 second
 #define pb push_back
 #define mp make_pair
-#define int long long
 #define fri(a) freopen(a,"r",stdin);
 #define fro(a) freopen(a,"w",stdout);
 const int MOD = 1e9 + 7;
 const int N = 5e2 + 5;
 
-int n, m, parent[N];
-set<int> adj[N];
+int n, m, capacity[N][N], initial_capacity[N][N];
+vector<int> adj[N];
 
-void dfs(int node, int p) {
-    parent[node] = p;
+int flow(int s, int t) {
+    vector<int> p(n + 1, -1);
+    p[s] = -2;
 
-    for (auto child : adj[node]) {
-        if (parent[child] == -1 && child != p) {
-            dfs(child, node);
+    queue<int> q;
+    q.push(s);
+
+    while (!q.empty() && p[t] == -1) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) {
+            if (p[v] == -1 && capacity[u][v] > 0) {
+                p[v] = u;
+                q.push(v);
+                if (v == t) break;
+            }
         }
     }
+    if (p[t] == -1) return 0;
+
+    int cur = t;
+    while (cur != s) {
+        int prev = p[cur];
+        capacity[prev][cur] -= 1;
+        capacity[cur][prev] += 1;
+        cur = prev;
+    }
+    return 1;
+}
+
+
+bool dfs(int u, int t, vector<int>& path) {
+    if (u == t) {
+        cout << path.size() << endl;
+        for (auto& v : path) {
+            cout << v << " ";
+        }
+        cout << endl;
+        return true;
+    }
+
+    bool flag = false;
+
+    for (auto& v : adj[u]) {
+        if (v != u && initial_capacity[u][v] && capacity[v][u]) {
+            path.push_back(v);
+            initial_capacity[u][v]--;
+            capacity[v][u]--;
+            flag |= dfs(v, t, path);
+            path.pop_back();
+            if (flag) return flag;
+        }
+    }
+
+    return false;
 }
 
 int32_t main() {
@@ -31,38 +76,43 @@ int32_t main() {
     //fri("in.txt");
     //fro("out.txt");
 
-    ios::sync_with_stdio(false);
+    ios_base::sync_with_stdio(false);
     cin.tie(NULL);
 
     cin >> n >> m;
+
     int a, b;
     for (int i = 0; i < m; i++) {
         cin >> a >> b;
-        adj[a].insert(b);
+        capacity[a][b]++;
+        initial_capacity[a][b]++;
+        adj[a].pb(b);
+        adj[b].pb(a);
     }
-    vector<vector<int>> res;
-    while (true) {
-        for (int i = 1; i <= n; i++)parent[i] = -1;
-        dfs(1, 0);
-        if (parent[n] == -1)break;
-
-        int curr = n;
-        res.pb(vector<int>());
-        while (curr != 0) {
-            res.back().pb(curr);
-            adj[parent[curr]].erase(curr);
-            curr = parent[curr];
-        }
+    int res = 0;
+    int f;
+    while (f = flow(1, n)) {
+        res += f;
     }
 
-    cout << res.size() << endl;
-    for (auto v : res) {
-        cout << v.size() << endl;
-        for (int i = 0; i < v.size(); i++) {
-            cout << v[v.size() - i - 1] << " ";
-        }
-        cout << endl;
-    }
+    // for (int i = 1; i <= n; i++) {
+    //     for (int j = 1; j <= n; j++) {
+    //         cout << initial_capacity[i][j] << " ";
+    //     }
+    //     cout << endl;
+    // }
+    // cout << endl;
+    // for (int i = 1; i <= n; i++) {
+    //     for (int j = 1; j <= n; j++) {
+    //         cout << capacity[i][j] << " ";
+    //     }
+    //     cout << endl;
+    // }
+    // cout << endl;
+
+    cout << res << endl;
+    vector<int> path = { 1 };
+    while (dfs(1, n, path)) {}
 
     return 0;
 }

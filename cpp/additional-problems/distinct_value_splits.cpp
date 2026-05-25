@@ -8,54 +8,52 @@ using namespace std;
 #define pb push_back
 #define mp make_pair
 #define int long long
-#define fri(a) freopen(a, "r", stdin);
-#define fro(a) freopen(a, "w", stdout);
+#define fri(a) freopen(a,"r",stdin);
+#define fro(a) freopen(a,"w",stdout);
 const int MOD = 1e9 + 7;
 const int N = 2e5 + 5;
 
-int n, m, t, arr[N], dp[N], last_non_distinct_index;
-map<int, int> last_occurrence;
-int fpow(int a, int b) {
-    if (b < 0) return 0;
-    int res = 1;
-    while (b) {
-        if (b & 1) res = (res * a) % MOD;
-        a = (a * a) % MOD;
-        b >>= 1;
-    }
-    return res;
-}
+int n, arr[N], next_position[N], dp[N], suffix_dp[N];
+map<int, int> np;
 
 int32_t main() {
-    fri("in.txt");
-    fro("out.txt");
+
+    //fri("test_input-2.txt");
+    //fro("out.txt");
 
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
 
     cin >> n;
+
+
     for (int i = 0; i < n; i++) {
         cin >> arr[i];
-        last_occurrence[arr[i]] = n;
+        next_position[i] = n;
     }
-    last_non_distinct_index = n;
-    last_occurrence[arr[n - 1]] = n - 1;
-    dp[n - 1] = 1;
-    for (int i = n - 2; i >= 0; i--) {
-        last_non_distinct_index =
-            min(last_non_distinct_index, last_occurrence[arr[i]]);
-        last_occurrence[arr[i]] = i;
-        if (last_non_distinct_index != n) {
-            dp[i] = dp[i + 1] + (dp[last_non_distinct_index] *
-                                 fpow(2, last_non_distinct_index - i - 2)) %
-                                    MOD;
-        } else {
-            dp[i] = 2 * dp[i + 1];
+    next_position[n] = n;
+
+    dp[n] = 1;
+    suffix_dp[n] = 1;
+
+    for (int i = n - 1; i >= 0; i--) {
+        if (np[arr[i]] != 0) {
+            next_position[i] = np[arr[i]];
         }
-        cout << dp[i] << " " << last_non_distinct_index << endl;
+        np[arr[i]] = i;
+        next_position[i] = min(next_position[i], next_position[i + 1]);
+
+        dp[i] = (suffix_dp[i + 1] - suffix_dp[next_position[i] + 1] + MOD) % MOD;
         dp[i] %= MOD;
+        suffix_dp[i] = (suffix_dp[i + 1] + dp[i]) % MOD;
+
+        //cout << i << ' ' << next_position[i] << ' ' << dp[i] << ' ' << suffix_dp[i] << endl;
+
     }
+
     cout << dp[0] << endl;
+
+
 
     return 0;
 }

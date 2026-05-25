@@ -47,7 +47,7 @@ int repair_classes(int offset, int n) {
 }
 
 void build_suffix_array(const string& str) {
-    s = "$" + str;
+    s = str + "$";
     int n = s.size();
     for (int i = 0; i < n; i++) {
         c[i] = (s[i] == '$' ? 0 : s[i] - 'a' + 1);

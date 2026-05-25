@@ -42,7 +42,6 @@ void build_hash() {
             prefix_hash[i] %= MOD;
         }
         else {
-
             prefix_hash[i] = prefix_hash[i - 1] + (s[i - 1] - 'a' + 2) * power[i - 1];
             prefix_hash[i] %= MOD;
         }
@@ -106,22 +105,19 @@ void build_suffix_array() {
 }
 
 int calc_lcp(int i, int j) {
-    // maximum possible match length
-    int maxLen = n - max(i, j);
-    int lo = 0, hi = maxLen;
+    int lo = 0, hi = n - max(i, j);
     while (lo < hi) {
-        // bias mid upward so loop terminates correctly
         int mid = (lo + hi + 1) >> 1;
-        // compare substrings s[i..i+mid-1] and s[j..j+mid-1]
         if (get_hash(i + 1, i + mid) == get_hash(j + 1, j + mid)) {
-            lo = mid;      // we can match at least mid characters
+            lo = mid;
         }
         else {
-            hi = mid - 1;  // too many—cut down
+            hi = mid - 1;
         }
     }
     return lo;
 }
+
 void build_lcp() {
     lcp[0] = 0;
 
